@@ -1,0 +1,22 @@
+{
+  "name": "Protobuf Parser In C",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode.cpptools"],
+      "settings": {
+        "[c]": {
+          "editor.defaultFormatter": "ms-vscode.cpptools",
+          "editor.formatOnSave": true,
+          "editor.tabSize": 4,
+          "editor.insertSpaces": true
+        },
+        "C_Cpp.clang_format_style": "Visual Studio",
+        "C_Cpp.clang_format_fallbackStyle": "Google"
+      }
+    }
+  },
+  "postCreateCommand": "make"
+}
