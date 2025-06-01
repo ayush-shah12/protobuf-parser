@@ -1,32 +1,24 @@
-# Protobuf Deserializer
+# Protobuf Deserializer And CLI Tool for OpenStreetMap
 
-A lightweight command-line tool written in C for parsing and querying OpenStreetMap PBF files. This project implements a custom PBF deserializer without relying on external parsing libraries, providing direct access to OSM map data.
+A lightweight command-line tool written in **C** for parsing and querying **OpenStreetMap (OSM) Protocol Buffer (PBF) files** — built entirely from scratch with **no external parsing libraries**. This project implements a protobuf deserializer that provides direct, efficient access to OSM map data in its compact binary format. The program can efficiently **deserialize** and query **any** valid PBF file.
 
-OpenStreetMap (OSM) uses Protocol Buffers (protobuf) as its primary data format for handling massive geographic datasets. Protocol Buffers were developed by Google to efficiently serialize structured data in a language-agnostic, platform-neutral format. They use a binary encoding that's both compact and fast to parse, making them ideal for OSM's massive datasets.
+## Why Protocol Buffers?
 
-To illustrate the scale: the map of Andorra, a country of just 180 square miles, contains nearly 500 million nodes. In human-readable XML format, this data would be ~77,000 KB, but using Protocol Buffers' binary serialization, it's compressed to just ~3,000 KB - a 96% reduction while maintaining all data. This efficiency is crucial when dealing with larger regions: continents and global datasets would be impractical to work with in XML format. See my program deserialize and run multiple queries against Andorra's 500 million nodes & 25K ways in under a second below! 
+**OpenStreetMap (OSM)** uses **Protocol Buffers (protobuf)** as its primary data format for handling massive geographic datasets. Protocol Buffers were developed by **Google** to efficiently serialize structured data in a language-agnostic, platform-neutral format. They use a binary encoding that's both compact and fast to parse, making them ideal for OSM's massive datasets.
 
-The binary format enables:
-- Rapid parsing and serialization of massive datasets
-- Minimal memory footprint during processing
-- Efficient storage and network transfer
-- Direct binary access to map elements
+See the technical details of the protobuf schema followed here: https://wiki.openstreetmap.org/wiki/PBF_Format.
 
-## Features
+## Scale and Efficiency
 
-- PBF file deserialization from scratch
-- Command-line interface for querying map data
-- Support for various query types:
-  - Map summary statistics
-  - Bounding box information
-  - Node lookup by ID
-  - Way lookup by ID
-  - Way key-value pair queries
+To illustrate the scale: the map of **Andorra**, a country of just *180 square miles*, contains nearly **500 thousand nodes**.  
 
+In human-readable XML format, this data would be approximately **~77,000 KB**, but using Protocol Buffers' binary serialization, it's compressed to just **~3,000 KB** — a **96% reduction** by efficiently encoding all the data.
+
+This efficiency is crucial when dealing with larger regions: continents and global datasets would be impractical to work with in XML format.
+
+See my program deserialize and run multiple queries against Andorra's **500 thousand nodes** & **25K ways** in under a second below!
 
 ## Usage
-
-The tool provides several command-line options for querying OSM map data:
 
 ```bash
 bin/osm_parser [-h] [-f filename] [-s] [-b] [-n id] [-w id] [-w id key ...]
@@ -41,9 +33,7 @@ Options:
   -w id key ...   Way values: displays values associated with the specified way and keys
 ```
 
-## Query
-
-Here's a comprehensive example that demonstrates multiple query types in a single command:
+## In Action
 
 ```bash
 bin/osm_parser -f files/andorra.osm.pbf \
@@ -63,8 +53,6 @@ bin/osm_parser -f files/andorra.osm.pbf \
         ref \                  #   - reference number
         surface                #   - surface type
 ```
-
-### Query Output
 
 ```
 === OSM Map Query Results ===
@@ -113,38 +101,25 @@ Requested Key-Value Pairs:
   surface: asphalt
 ```
 
+## Technical Implementation
+
+The implementation demanded careful and precise handling of OSM’s Protocol Buffer schema, balancing efficiency, accuracy, and broad compatibility with any valid PBF file.
+
+
+1. **Binary Protocol Handling**:
+   - Direct parsing of varint-encoded fields and wire types
+   - Multi-level nested message structures
+   - String table optimization for tag management
+   - Delta-encoded coordinate compression
+   - Field number tracking for nested messages
+
+2. **Data Structure Design**:
+   - Custom OSM primitive implementations
+   - Memory-optimized coordinate storage
+   - Efficient node and way reference lookups
+   - Minimal memory footprint design
+
+The implementation strictly adheres to the OSM PBF specification, enabling reliable parsing of any valid PBF file while maintaining optimal performance and memory efficiency.
+
 Try it out for yourself by obtaining a protobuf serialized version of an OSM Map here: https://download.geofabrik.de/
-
-## Technical Details
-
-This project implements a custom PBF (Protocol Buffer Format) deserializer for OpenStreetMap data. It provides:
-
-- Direct binary parsing of PBF files
-- Memory-efficient data structures
-- Command-line interface for data access
-- No external parsing library dependencies
-
-### Protocol Buffer Implementation
-
-The implementation required careful handling of OSM's Protocol Buffer schema:
-
-1. **Schema Definition**:
-   - Implemented the OSM PBF schema in C
-   - Handled multi-nested message types for nodes, ways, and relations
-   - Managed tag key-value pairs using string tables
-   - Implemented delta encoding for coordinates
-
-2. **Binary Parsing**:
-   - Direct binary reading of varint-encoded fields
-   - Handling of wire types (0: varint, 1: 64-bit, 2: length-delimited)
-   - Proper field number tracking for nested messages
-   - Efficient string table management
-
-3. **Data Structures**:
-   - Custom implementations for OSM primitives (Node, Way, Relation)
-   - Efficient memory management for large datasets
-   - Optimized coordinate storage using delta encoding
-   - Fast lookup tables for node and way references
-
-The implementation follows the OSM PBF specification exactly, allowing for reliable parsing of any valid OSM PBF file while maintaining high performance and low memory usage.
 
